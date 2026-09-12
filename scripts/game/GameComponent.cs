@@ -55,6 +55,7 @@ public partial class GameComponent : Node3D
         {
             string audioPath = $"{MapUtil.MapsCacheFolder}/{attempt.Map.Name}/audio.{attempt.Map.AudioExt}";
             song.Stream = Util.Audio.LoadFromFile(audioPath);
+            song.VolumeDb = SoundManager.ComputeVolumeDb((float)attempt.Settings.VolumeMusic.Value, (float)attempt.Settings.VolumeMaster.Value, 70);
             song.Play();
         }
 
