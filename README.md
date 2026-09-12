@@ -51,8 +51,9 @@ Motorhytha is an early, actively-developed beta. What works today:
 - **Old map import** — any previously-imported map plays back, with its notes collapsed onto 3 lanes.
 - **Audio-synced playback** — the map's song plays and drives the game clock, so gates stay in sync with the music instead of drifting.
 - **Basic scoring** — a Score/Combo HUD increments on cleared gates and resets on a miss.
+- **A motorcycle that looks like one** — a small multi-part bike model (body/tank/seat/wheels), gates rendered with Rhythia's own rounded-square "squircle" note mesh in per-lane colors, and a glow-enabled environment so it isn't just flat gray boxes.
 
-What's not built yet: a map-select screen (it currently auto-picks the first map in your library), health/fail state, proper hit-accuracy judgments (a gate currently only checks lane + timing window, not a graded hit), bike/track art (everything is placeholder boxes), and a packaged release build.
+What's not built yet: a map-select screen (it currently auto-picks the first map in your library), health/fail state, proper hit-accuracy judgments (a gate currently only checks lane + timing window, not a graded hit), a real track/road model (lanes are still flat colored strips), and a packaged release build.
 
 ---
 
@@ -61,7 +62,8 @@ What's not built yet: a map-select screen (it currently auto-picks the first map
 There's no packaged release yet — see [Building and Exporting](#building-and-exporting) to run it from source. Once running:
 
 - **A** / **D** — move the bike one lane left/right.
-- Import a map into your Rhythia/Motorhytha user folder the same way you would for Rhythia, and it'll be picked up automatically.
+- Import a map into your Rhythia/Motorhytha user folder the same way you would for Rhythia, and it'll be picked up automatically (the game currently just plays whichever map it finds first — there's no map-select screen yet).
+- With no maps imported, it still runs as a free-drive attempt: no gates, just the bike and the road, useful for checking movement/visuals work.
 
 ---
 
@@ -104,6 +106,8 @@ There's no packaged release yet — see [Building and Exporting](#building-and-e
 
 ### Building and Exporting
 
+#### Run it in the editor (fastest way to try changes)
+
 1. Clone the repo and fetch large files:
    ```bash
    git clone <this-repo-url>
@@ -111,9 +115,34 @@ There's no packaged release yet — see [Building and Exporting](#building-and-e
    git lfs fetch --all
    git lfs pull
    ```
-2. Open **Godot 4.6 (.NET)**, choose **Import**, and select this folder's `project.godot`.
-3. Press **Play** — the project's main scene is `scenes/motorcycle.tscn`, so it boots straight into the motorcycle prototype.
-4. To produce a standalone build: **Project → Export**, add a preset for your target platform (you'll need that platform's export templates installed), and export. There is no CI-built release yet, so this is currently the only way to get a runnable binary.
+2. Open **Godot 4.6.2 (.NET/Mono build)**, choose **Import**, and select this folder's `project.godot`.
+3. Press **Play** (F5). The project's main scene is `scenes/motorcycle.tscn`, so it boots straight into the motorcycle prototype — no menu to click through.
+
+#### Build/compile from the command line
+
+You don't need the Godot editor open just to check the C# compiles:
+
+```bash
+dotnet restore Rhythia.csproj
+dotnet build Rhythia.csproj -c Debug
+```
+
+This produces `Rhythia.dll` under `.godot/mono/temp/bin/`. It's enough to catch compile errors, but it does **not** produce a runnable game on its own — that still needs Godot.
+
+#### Export a standalone build
+
+This is what actually produces a `.exe`/`.x86_64` you can hand someone. It needs the Godot **editor** (not just the .NET SDK) plus that platform's **export templates**, matching your project's Godot version exactly (currently `4.6.2`, mono/.NET build):
+
+1. Download the Godot 4.6.2 **mono** editor and its matching **export templates** for your OS from the [Godot releases page](https://github.com/godotengine/godot/releases/tag/4.6.2-stable) — you need the `_mono_` build, not the standard one, since this project uses C#.
+2. Install the templates so Godot can find them (Godot does this for you via **Editor → Manage Export Templates** if you point it at the downloaded `.tpz` file; on Linux this lands in `~/.local/share/godot/export_templates/4.6.2.stable.mono/`).
+3. In the editor: **Project → Export**, add a preset for your target platform (Windows/Linux/macOS), and click **Export Project**.
+   - Headless/CI equivalent, once an `export_presets.cfg` exists in the project:
+     ```bash
+     godot --headless --import      # make sure resources are imported first
+     godot --headless --export-release "Linux" builds/linux/Motorhytha.x86_64
+     ```
+   - `export_presets.cfg` is gitignored (matching upstream Rhythia's convention) since it's environment-specific — you'll need to create your own preset via the editor once, or write one by hand, before the headless export command above will work.
+4. There is no CI-built release yet, so exporting locally is currently the only way to get a runnable binary.
 
 ---
 

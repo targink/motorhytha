@@ -29,16 +29,21 @@ obstacle/gate charts, instead of re-deriving timing and scoring.
 | `GameComponent.Play()` | Now also loads `Attempt.Map.Notes` (decoded by the existing `MapParser`) into `Attempt.Objects[typeof(Note)]`, so old map files work unchanged, and plays that map's audio through its own `AudioStreamPlayer` |
 | Free-running/song-driven progress clock | `Attempt.Progress` is driven by the song's actual playback position (`AudioStreamPlayer.GetPlaybackPosition()`) whenever one is playing, falling back to a delta-time clock in freeplay with no map |
 | `ScoreJudgment` (unimplemented stub upstream) | `MotorcycleHitJudgment` also tracks `Attempt.Score`/`Attempt.Combo`, shown by a new `MotorcycleHud` |
+| Note mesh: `user/meshes/squircle.obj`, unshaded + vertex-colored | `GateRenderer` reuses the same squircle mesh for gates (instead of a plain `BoxMesh`), colored per lane, fading in and spinning as they approach |
+| Cursor sprite / note glow (bloom from the menu's own `WorldEnvironment`) | `motorcycle.tscn` has its own `WorldEnvironment` (glow enabled, dark background) since it runs standalone and doesn't go through `main.tscn`'s background/space setup |
 
 ## Status
 
 Playable loop end-to-end: `GameComponent` auto-selects the first map in the
 player's library, loads its notes and audio, and plays it back in sync. The
 bike moves between 3 lanes with A/D, gates resolve as hit/missed against
-`HIT_WINDOW`, and Score/Combo update on a HUD. Verified in an actual exported
-build (screenshot-tested via a headless run), not just the editor.
+`HIT_WINDOW`, and Score/Combo update on a HUD. The bike is a small multi-part
+model (body/tank/seat/wheels) rather than a single box, and gates use
+Rhythia's own squircle note mesh with per-lane colors and a glow environment.
+Verified in an actual exported build (screenshot-tested via a headless run),
+not just the editor.
 
 Still missing: a map-select screen (it just grabs the first map found),
 health/fail state, graded hit accuracy (currently pass/fail only, not
-timing-graded), and real bike/track art — everything visible today is
-placeholder boxes.
+timing-graded), and a real track/road model — the lanes themselves are still
+flat colored strips, not a modeled road.
