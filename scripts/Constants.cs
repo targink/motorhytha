@@ -26,6 +26,17 @@ public partial class Constants : Node
 
     public static readonly int BREAK_TIME = 4000;  // used for skipping breaks mid-map
 
+    // Motorcycle mode: distance in meters between adjacent lanes (collapsed
+    // from the old 3x3 grid down to 3 lanes in a single row).
+    public static readonly float MOTORCYCLE_LANE_WIDTH = 1.2f;
+
+    // Motorcycle mode, freeroam: how far from center the bike can steer
+    // (wider than the 3 painted lanes, since freeroam isn't lane-locked)
+    // and how fast it moves there, in world units/second.
+    public static readonly float MOTORCYCLE_FREEROAM_BOUND = 4f;
+
+    public static readonly float MOTORCYCLE_FREEROAM_SPEED = 4f;
+
     public static readonly string[] DIFFICULTIES = ["N/A", "Easy", "Medium", "Hard", "Insane", "Illogical"];
 
     public static readonly Color[] DIFFICULTY_COLORS = [Color.FromHtml("ffffff"), Color.FromHtml("77f379"), Color.FromHtml("fff832"), Color.FromHtml("e24479"), Color.FromHtml("9d6eff"), Color.FromHtml("0094fc")];

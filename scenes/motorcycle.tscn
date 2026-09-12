@@ -1,0 +1,166 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/GameComponent.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/game/ui/MotorcycleController.cs" id="2"]
+[ext_resource type="Script" path="res://scripts/game/renderers/GateRenderer.cs" id="3"]
+[ext_resource type="Script" path="res://scripts/game/ui/MotorcycleHud.cs" id="4"]
+
+[sub_resource type="Environment" id="Environment_glow"]
+background_mode = 1
+background_color = Color(0.043, 0.031, 0.078, 1)
+ambient_light_source = 1
+ambient_light_color = Color(0.55, 0.5, 0.65, 1)
+ambient_light_energy = 0.6
+glow_enabled = true
+glow_intensity = 1.1
+glow_bloom = 0.15
+glow_blend_mode = 1
+fog_enabled = true
+fog_light_color = Color(0.043, 0.031, 0.078, 1)
+fog_density = 0.01
+
+[sub_resource type="BoxMesh" id="BoxMesh_lane"]
+size = Vector3(1.0, 0.05, 40.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+size = Vector3(10.0, 0.02, 40.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+shading_mode = 0
+albedo_color = Color(0.12, 0.1, 0.18, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lane"]
+shading_mode = 0
+albedo_color = Color(0.32, 0.3, 0.4, 1)
+emission_enabled = true
+emission = Color(0.35, 0.2, 0.6, 1)
+emission_energy_multiplier = 0.25
+
+[sub_resource type="BoxMesh" id="BoxMesh_body"]
+size = Vector3(0.34, 0.32, 1.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+shading_mode = 0
+albedo_color = Color(0.95, 0.12, 0.22, 1)
+emission_enabled = true
+emission = Color(0.95, 0.12, 0.22, 1)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_tank"]
+size = Vector3(0.3, 0.2, 0.32)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tank"]
+shading_mode = 0
+albedo_color = Color(1, 0.8, 0.15, 1)
+emission_enabled = true
+emission = Color(1, 0.8, 0.15, 1)
+emission_energy_multiplier = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_seat"]
+size = Vector3(0.26, 0.16, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_seat"]
+shading_mode = 0
+albedo_color = Color(0.08, 0.08, 0.1, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wheel"]
+top_radius = 0.28
+bottom_radius = 0.28
+height = 0.14
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wheel"]
+shading_mode = 0
+albedo_color = Color(0.05, 0.05, 0.06, 1)
+
+[node name="MotorcycleGame" type="Node3D" node_paths=PackedStringArray("Camera", "InterfaceComponents", "Renderers")]
+script = ExtResource("1")
+Camera = NodePath("Camera")
+InterfaceComponents = [NodePath("MotorcycleController"), NodePath("Hud")]
+Renderers = [NodePath("GateRenderer")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_glow")
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 1.5, 3.75)
+current = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.32, -15)
+mesh = SubResource("BoxMesh_ground")
+material_override = SubResource("StandardMaterial3D_ground")
+
+[node name="LaneLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, -0.3, -15)
+mesh = SubResource("BoxMesh_lane")
+material_override = SubResource("StandardMaterial3D_lane")
+
+[node name="LaneCenter" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, -15)
+mesh = SubResource("BoxMesh_lane")
+material_override = SubResource("StandardMaterial3D_lane")
+
+[node name="LaneRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, -0.3, -15)
+mesh = SubResource("BoxMesh_lane")
+material_override = SubResource("StandardMaterial3D_lane")
+
+[node name="MotorcycleController" type="Node3D" parent="." node_paths=PackedStringArray("Bike", "Camera")]
+script = ExtResource("2")
+Bike = NodePath("Bike")
+Camera = NodePath("../Camera")
+
+[node name="Bike" type="Node3D" parent="MotorcycleController"]
+
+[node name="Body" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+mesh = SubResource("BoxMesh_body")
+material_override = SubResource("StandardMaterial3D_body")
+
+[node name="Tank" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -0.28)
+mesh = SubResource("BoxMesh_tank")
+material_override = SubResource("StandardMaterial3D_tank")
+
+[node name="Seat" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0.32)
+mesh = SubResource("BoxMesh_seat")
+material_override = SubResource("StandardMaterial3D_seat")
+
+[node name="FrontWheel" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, -0.16, -0.46)
+mesh = SubResource("CylinderMesh_wheel")
+material_override = SubResource("StandardMaterial3D_wheel")
+
+[node name="RearWheel" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, -0.16, 0.46)
+mesh = SubResource("CylinderMesh_wheel")
+material_override = SubResource("StandardMaterial3D_wheel")
+
+[node name="GateRenderer" type="Node3D" parent="."]
+script = ExtResource("3")
+
+[node name="Hud" type="Node3D" parent="." node_paths=PackedStringArray("Label", "SongLabel", "StatusLabel")]
+script = ExtResource("4")
+Label = NodePath("Label")
+SongLabel = NodePath("SongLabel")
+StatusLabel = NodePath("StatusLabel")
+
+[node name="Label" type="Label3D" parent="Hud"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 1.6, 1)
+text = "Score 0
+Combo 0"
+font_size = 32
+outline_size = 6
+
+[node name="SongLabel" type="Label3D" parent="Hud"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 1.8, 1)
+text = "..."
+font_size = 24
+outline_size = 6
+modulate = Color(1, 1, 1, 0.8)
+
+[node name="StatusLabel" type="Label3D" parent="Hud"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 1)
+font_size = 44
+outline_size = 10
+horizontal_alignment = 1

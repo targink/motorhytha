@@ -1,154 +1,82 @@
 <p align="center">
-  <img src="https://github.com/Rhythia/Client/blob/master/textures/RhythiaSquircle.png?raw=true" alt="Rhythia" width="400"/>
+  <img src="https://github.com/Rhythia/Client/blob/master/textures/RhythiaSquircle.png?raw=true" alt="Motorhytha" width="400"/>
 </p>
 
-<h3 align="center">A free-to-play rhythm game where you move your mouse across a 3×3 grid.</h3>
+<h3 align="center">A motorcycle rhythm game: steer your bike across 3 lanes in time with the music.</h3>
 
 <p align="center">
-  <a href="https://discord.gg/rhythia"><img src="https://img.shields.io/discord/1234567890?label=Discord&logo=discord&logoColor=white&color=5865F2" alt="Discord"></a>
   <img src="https://img.shields.io/badge/Godot-4.6-%23478CBF?logo=godot-engine&logoColor=white" alt="Godot 4.6">
+  <img src="https://img.shields.io/badge/status-early%20beta-orange" alt="Early beta">
 </p>
 
 ---
 
-> *"Rhyt-Rhythmia"*
-> — Edward "BTMC" Ling, 2024
-
 > [!CAUTION]
-> **Rhythia is NOT affiliated with CAPO Games, Steam Rhythia, or rhythia.com in any way.** We cannot provide support or assistance for any issues related to those platforms. Please ensure you are downloading the correct client from the links below. We do, however, support any modification of our logos and content in the client source under our [license](LICENSE).
+> **Motorhytha is NOT affiliated with CAPO Games, Steam Rhythia, rhythia.com, or the official Rhythia project in any way.** We cannot provide support for issues related to those platforms.
 
 ---
 
 ## Table of Contents
 
 - [About](#about)
-- [Downloading the Game](#downloading-the-game)
-  - [Rewrite (Current)](#rewrite-current-maintained-client)
-  - [Nightly (Legacy)](#nightly-legacy)
-- [Installation](#installation)
-  - [Windows](#windows)
-  - [Linux](#linux)
-  - [Linux Troubleshooting](#linux-troubleshooting)
-- [User Folder](#user-folder)
+- [Status](#status)
+- [Playing](#playing)
 - [Development](#development)
   - [Prerequisites](#prerequisites)
   - [Project Structure](#project-structure)
+  - [Building and Exporting](#building-and-exporting)
 - [Contributing](#contributing)
+- [Credits](#credits)
+- [License](#license)
 
 ---
 
 ## About
 
-**Rhythia** (formerly *Sound Space Plus*) is a free and open-source rhythm game built with **Godot 4.6** and **C#**.
+**Motorhytha** is a motorcycle rhythm game built on a fork of [Rhythia](https://github.com/Rhythia/Client)'s Godot 4.6 + C# game framework.
+
+Rhythia is a rhythm game where you move a mouse cursor across a 3×3 grid to hit notes. Motorhytha keeps Rhythia's underlying engine (audio timing, map parsing, judgments/scoring, mods, camera handling) but replaces the core mechanic entirely: instead of a cursor on a grid, you steer a motorcycle across **3 lanes** with **A** and **D**, dodging and hitting gates that approach in time with the beat.
+
+Old Rhythia/Sound Space map files still work — a map's 3×3 grid is collapsed down to 3 lanes (its column becomes the lane, its row is ignored), so any existing chart can be played as a motorcycle track with no conversion step.
+
+See [`docs/MOTORCYCLE_FORK.md`](docs/MOTORCYCLE_FORK.md) for the full design rationale and a mapping between Rhythia's original concepts and Motorhytha's.
 
 ---
 
-## Downloading the Game
+## Status
 
-There are currently two builds of the game available.
+Motorhytha is an early, actively-developed beta. What works today:
 
-> [!IMPORTANT]
-> **Do not** clone this repository to play the game. Use the download links below instead.
+- **A/D lane movement** — the bike moves between 3 discrete lanes with eased motion and a cosmetic lean.
+- **Old map import** — pick an `.sspm`/`.phxm`/`.txt` file straight from the select screen (same decode path Rhythia already has), and it plays back with its notes collapsed onto 3 lanes.
+- **Audio-synced playback** — the map's song plays and drives the game clock, so gates stay in sync with the music instead of drifting.
+- **Graded scoring and a health bar** — gates grade Perfect/Good/Miss (not just pass/fail), a health bar drains on misses and recovers on hits, and hitting 0 fails the run.
+- **Pause and quit** — Escape pauses (freezes the song, the bike, and judging), Q while paused or failed returns to the select screen.
+- **A motorcycle that looks like one** — a small multi-part bike model (body/tank/seat/wheels), gates rendered with Rhythia's own rounded-square "squircle" note mesh in per-lane colors, and a glow-enabled environment so it isn't just flat gray boxes.
+- **A real map-select screen** — lists every map in your library, lets you import more, plus Free Drive and Freeroam options; this is what actually launches when you start the game.
+- **Freeroam mode** — smooth, continuous A/D steering across the whole road instead of snapping between the 3 lanes, for just cruising around with no map/gates.
 
-### Rewrite (Current Maintained Client)
+All of the above has been verified against a real map file end-to-end (decoded, cached, listed, played, gates rendered in the right lanes, Score/Combo updating), not just claimed — see [`docs/MOTORCYCLE_FORK.md`](docs/MOTORCYCLE_FORK.md) if you want the details.
 
-The current client being actively maintained, now in early testing.
-
-> [!NOTE]
-> **Recommended** — This is the latest version of the client. Please report any bugs found in **#bug-reports** on our [Discord](https://discord.gg/rhythia) server.
-
-You can view all releases on the [Rewrite releases page](https://github.com/Rhythia/Client/releases).
-
-| Platform | Direct Download |
-|---|---|
-| **Windows** | [Download](https://github.com/Rhythia/Client/releases/latest/download/windows.zip) |
-| **Linux** | [Download](https://github.com/Rhythia/Client/releases/latest/download/linux.zip) |
-
-You can view the Rewrite source code [here](https://github.com/Rhythia/Client).
-
-### Nightly (Legacy)
-
-The legacy client we all know and (somewhat) love. We recommend this client if you're just starting out for now.
-
-> [!WARNING]
-> **Nightly is no longer being maintained.** All current development efforts are focused on the Rewrite client above.
-
-You can view all releases on the [Nightly releases page](https://github.com/David20122/sound-space-plus/releases).
-
-| Platform | Direct Download |
-|---|---|
-| **Windows** | [Download](https://github.com/David20122/sound-space-plus/releases/latest/download/windows.zip) |
-| **Linux** | [Download](https://github.com/David20122/sound-space-plus/releases/latest/download/linux.zip) |
-
-You can view Nightly's source code [here](https://github.com/David20122/sound-space-plus).
+What's not built yet: a real track/road model (lanes are still flat colored strips) and a packaged release build.
 
 ---
 
-## Installation
+## Playing
 
-### Windows
+There's no packaged release yet — see [Building and Exporting](#building-and-exporting) to run it from source. Once running, you'll land on the map-select screen:
 
-1. Download `windows.zip` for your chosen client above.
-2. Extract the `.zip` file to a folder of your choice.
-3. Run `Rhythia.exe`.
+- Press **Import Map** and pick an old Rhythia/Sound Space map file (`.sspm`, `.phxm`, or `.txt`) — it decodes, caches, and shows up in the list as a button. You can also drop an already-converted `.phxm` file straight into your user folder's `maps/` directory and it'll be picked up on next launch.
+- No maps imported? Press **Free Drive** (no gates, still 3 lanes) or **Freeroam** (no gates, no lanes — smooth free steering across the whole road) — both useful for checking movement/visuals work.
+- In-game: **A** / **D** move the bike one lane left/right (Free Drive and normal play), or steer continuously (Freeroam). **Escape** pauses (**Q** while paused quits to the select screen).
+- Miss too many gates and your health bar hits 0 — the run fails (**Q** to quit back to the select screen).
 
-> [!WARNING]
-> You **must** have the [Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe) installed to run the game on Windows!
-
-### Linux
-
-#### GUI File Manager
-
-> [!TIP]
-> The following packages are recommended: `thunar`, `thunar-archive-plugin`
-
-1. Download `linux.zip` for your chosen client above.
-2. Right-click the downloaded file and extract it.
-3. Run `Rhythia.x86_64`.
-
-#### Terminal
-
-> [!WARNING]
-> The `unzip` package is **required**. Install it using your distribution's package manager if you don't have it.
-
-1. Download `linux.zip` for your chosen client above.
-2. Open your terminal and run the following commands:
-   ```bash
-   # Assuming the file is in the Downloads folder
-   cd $HOME/Downloads
-   unzip -d Rhythia linux.zip
-   ```
-3. Move into the extracted folder and run the game:
-   ```bash
-   cd Rhythia
-   ./Rhythia.x86_64
-   ```
-
-### Linux Troubleshooting
-
-If your game doesn't run, make the binary executable from within your Rhythia folder:
-
-```bash
-sudo chmod +x Rhythia.x86_64
-```
-
-> [!NOTE]
-> You need to be a superuser in order to run `sudo`.
-
-Still having issues? Visit the **#support** channel in our [Discord](https://discord.gg/rhythia).
-
----
-
-## User Folder
-
-Your maps, replays, skins, and settings are stored separately from the game installation:
+Motorhytha uses its own user data folder, separate from a real Rhythia install on the same machine:
 
 | Platform | Path |
 |---|---|
-| **Windows** | `%appdata%\Rhythia` |
-| **Linux** | `~/.local/share/Rhythia` |
-
-You can also access the user folder from within the game via **Settings → User Folder**.
+| **Windows** | `%appdata%\Motorhytha` |
+| **Linux** | `~/.local/share/Motorhytha` |
 
 ---
 
@@ -166,16 +94,19 @@ You can also access the user folder from within the game via **Settings → User
 
 ```
 ├── addons/          # Third-party addons (ffmpeg, etc.)
+├── docs/            # Design docs (see MOTORCYCLE_FORK.md)
 ├── fonts/           # Font assets
 ├── meshes/          # 3D mesh assets
 ├── prefabs/         # Reusable scene prefabs (UI elements, etc.)
-├── scenes/          # Main game scenes (menu, game, results, etc.)
+├── scenes/          # Main game scenes: motorcycle_select.tscn (entry point)
+│                    #  and motorcycle.tscn (gameplay)
 ├── scripts/         # C# source code
 │   ├── database/    # Database / persistence layer
-│   ├── game/        # Core gameplay (attempts, renderers, mods, judgments)
-│   ├── map/         # Map parsing and management
+│   ├── game/        # Core gameplay (attempts, renderers, mods, judgments,
+│   │                #  motorcycle-mode scripts live alongside the rest here)
+│   ├── map/         # Map parsing and management (unchanged old-format support)
 │   ├── multiplayer/ # Multiplayer lobby and player logic
-│   ├── scenes/      # Scene-specific scripts
+│   ├── scenes/      # Scene-specific scripts, including MotorcycleSelect.cs
 │   ├── shaders/     # Shader code
 │   ├── skinning/    # Skin loading and management
 │   ├── spaces/      # Space-related logic
@@ -187,89 +118,67 @@ You can also access the user folder from within the game via **Settings → User
 └── user/            # Default user data scaffold
 ```
 
+### Building and Exporting
+
+#### Run it in the editor (fastest way to try changes)
+
+1. Clone the repo and fetch large files:
+   ```bash
+   git clone <this-repo-url>
+   cd motorhytha
+   git lfs fetch --all
+   git lfs pull
+   ```
+2. Open **Godot 4.6.2 (.NET/Mono build)**, choose **Import**, and select this folder's `project.godot`.
+3. Press **Play** (F5). The project's main scene is `scenes/motorcycle.tscn`, so it boots straight into the motorcycle prototype — no menu to click through.
+
+#### Build/compile from the command line
+
+You don't need the Godot editor open just to check the C# compiles:
+
+```bash
+dotnet restore Rhythia.csproj
+dotnet build Rhythia.csproj -c Debug
+```
+
+This produces `Rhythia.dll` under `.godot/mono/temp/bin/`. It's enough to catch compile errors, but it does **not** produce a runnable game on its own — that still needs Godot.
+
+#### Export a standalone build
+
+This is what actually produces a `.exe`/`.x86_64` you can hand someone. It needs the Godot **editor** (not just the .NET SDK) plus that platform's **export templates**, matching your project's Godot version exactly (currently `4.6.2`, mono/.NET build):
+
+1. Download the Godot 4.6.2 **mono** editor and its matching **export templates** for your OS from the [Godot releases page](https://github.com/godotengine/godot/releases/tag/4.6.2-stable) — you need the `_mono_` build, not the standard one, since this project uses C#.
+2. Install the templates so Godot can find them (Godot does this for you via **Editor → Manage Export Templates** if you point it at the downloaded `.tpz` file; on Linux this lands in `~/.local/share/godot/export_templates/4.6.2.stable.mono/`).
+3. In the editor: **Project → Export**, add a preset for your target platform (Windows/Linux/macOS), and click **Export Project**.
+   - Headless/CI equivalent, once an `export_presets.cfg` exists in the project:
+     ```bash
+     godot --headless --import      # make sure resources are imported first
+     godot --headless --export-release "Linux" builds/linux/Motorhytha.x86_64
+     ```
+   - `export_presets.cfg` is gitignored (matching upstream Rhythia's convention) since it's environment-specific — you'll need to create your own preset via the editor once, or write one by hand, before the headless export command above will work.
+4. There is no CI-built release yet, so exporting locally is currently the only way to get a runnable binary.
+
 ---
 
 ## Contributing
 
-We ❤️ developers! Contributions are welcome — whether it's bug fixes, features, documentation, or translations.
+Contributions are welcome — bug fixes, gameplay features, art, or documentation.
 
-> [!WARNING]
-> **Nightly is no longer actively maintained.** This guide is for contributing to the **Rewrite** client. The contribution process is the same, but you'll be working with the [Rewrite repository](https://github.com/Rhythia/Client).
+1. Fork the repository and clone your fork.
+2. Make your changes on a branch.
+3. Test locally in the Godot editor before submitting.
+4. Open a pull request describing what changed and why.
 
-### Required Software
+Keep PRs focused — one feature or fix per PR — and follow the existing code style.
 
-| Software | Notes |
-|---|---|
-| [Godot 4.6 Stable (.NET)](https://godotengine.org/download) | The C# / .NET build is required |
-| [Git](https://git-scm.com/downloads) | Windows: Git for Windows · Linux: `git` package |
-| [GitHub Account](https://github.com/signup) | Needed to fork and open pull requests |
+---
 
-**Optional:** [Visual Studio Code](https://code.visualstudio.com/) with the [godot-tools](https://marketplace.visualstudio.com/items?itemName=geequlim.godot-tools) extension.
+## Credits
 
-### Setting Up Your Workspace
-
-#### 1. Fork the Repository
-
-1. Head to the [Rewrite repository](https://github.com/Rhythia/Client).
-2. Press the **Fork** button and create a fork under your account.
-
-#### 2. Clone Your Fork
-
-Open a terminal and clone your fork into a folder of your choice:
-
-```bash
-# Navigate to your preferred directory
-cd Documents/Rhythia
-
-# Clone your fork (replace YOUR_USERNAME with your GitHub username)
-git clone https://github.com/YOUR_USERNAME/Client.git
-
-cd Client
-
-# Fetch large files (textures, audio, etc.)
-git lfs fetch --all
-git lfs pull
-```
-
-#### 3. Open in Godot
-
-1. Open **Godot 4.6 (.NET)**.
-2. Click **Import**.
-3. Browse to your cloned repository folder and select `project.godot`.
-4. Click **Open**.
-
-### Submitting Your Changes
-
-1. **Stage** any new files you created:
-   ```bash
-   git add ./path/to/your/new/files
-   ```
-
-2. **Commit** and **push** your changes:
-   ```bash
-   git commit -m "Brief description of your change"
-   git push origin indev
-   ```
-
-3. Go to your forked repository on GitHub — you should see a message like *"This branch is 1 commit ahead of Rhythia/Client:indev"*.
-
-4. Click **Contribute → Open pull request**.
-
-5. Ensure your PR is targeting the **`indev`** branch of the main repository.
-
-6. Review your changes, add a clear title and description, then click **Create pull request**.
-
-7. Wait for maintainers to review your code and provide feedback.
-
-### Guidelines
-
-- Follow existing code style and naming conventions.
-- Keep PRs focused — one feature or fix per PR.
-- Test your changes locally before submitting.
-- For large changes, open an issue first to discuss the approach.
+Motorhytha is built on top of [Rhythia](https://github.com/Rhythia/Client) (formerly *Sound Space Plus*), an open-source rhythm game by the Rhythia team. Motorhytha is a separate, unaffiliated project.
 
 ---
 
 ## License
 
-Rhythia is licensed under the [GNU Affero General Public License v3.0](LICENSE).
+Motorhytha, like the Rhythia code it's built on, is licensed under the [GNU Affero General Public License v3.0](LICENSE).

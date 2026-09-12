@@ -1,0 +1,100 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/scenes/MotorcycleSelect.cs" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.08, 0.06, 0.14, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 48
+font_color = Color(1, 0.9, 0.3, 1)
+
+[node name="MotorcycleSelect" type="Control" node_paths=PackedStringArray("MapList", "FreeDriveButton", "FreeRoamButton", "ImportButton", "ImportDialog", "StatusLabel")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+MapList = NodePath("Center/Panel/Layout/Scroll/MapList")
+FreeDriveButton = NodePath("Center/Panel/Layout/ModeButtons/FreeDriveButton")
+FreeRoamButton = NodePath("Center/Panel/Layout/ModeButtons/FreeRoamButton")
+ImportButton = NodePath("Center/Panel/Layout/ImportButton")
+ImportDialog = NodePath("Center/Panel/Layout/ImportButton/ImportDialog")
+StatusLabel = NodePath("Center/Panel/Layout/StatusLabel")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.043, 0.031, 0.078, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(420, 480)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Layout" type="VBoxContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Panel/Layout"]
+layout_mode = 2
+text = "MOTORHYTHA"
+label_settings = SubResource("LabelSettings_title")
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="Center/Panel/Layout"]
+layout_mode = 2
+text = "Loading maps..."
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Center/Panel/Layout"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MapList" type="VBoxContainer" parent="Center/Panel/Layout/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="ImportButton" type="Button" parent="Center/Panel/Layout"]
+layout_mode = 2
+text = "Import Map"
+
+[node name="ImportDialog" type="FileDialog" parent="Center/Panel/Layout/ImportButton"]
+title = "Open File(s)"
+initial_position = 2
+size = Vector2i(571, 211)
+ok_button_text = "Open"
+file_mode = 1
+access = 2
+filters = PackedStringArray("*.sspm", "*.phxm", "*.txt")
+use_native_dialog = true
+
+[node name="ModeButtons" type="HBoxContainer" parent="Center/Panel/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FreeDriveButton" type="Button" parent="Center/Panel/Layout/ModeButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Free Drive"
+tooltip_text = "No map, no gates - still locked to the 3 lanes."
+
+[node name="FreeRoamButton" type="Button" parent="Center/Panel/Layout/ModeButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Freeroam"
+tooltip_text = "No map, no lanes - smooth free steering across the whole road."
