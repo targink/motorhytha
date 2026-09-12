@@ -30,6 +30,10 @@ public partial class GameComponent : Node3D
 
     public Attempt CurrentAttempt { get; private set; } = new();
 
+    // Owns its own player instead of the shared SoundManager autoload, since
+    // this component (and motorcycle mode) needs to run standalone.
+    private AudioStreamPlayer song;
+
     public void Play(Attempt attempt)
     {
         Input.MouseMode = CurrentAttempt.Settings.AbsoluteInput.Value ? Input.MouseModeEnum.ConfinedHidden : Input.MouseModeEnum.Captured;
@@ -44,17 +48,47 @@ public partial class GameComponent : Node3D
         attempt.BikeLane = 0;
         attempt.BikeLaneOffset = 0;
 
+        song.Stop();
+
+        if (attempt.Map != null)
+        {
+            string audioPath = $"{MapUtil.MapsCacheFolder}/{attempt.Map.Name}/audio.{attempt.Map.AudioExt}";
+            song.Stream = Util.Audio.LoadFromFile(audioPath);
+            song.Play();
+        }
+
         ApplySettings(attempt.Settings);
     }
 
     public override void _Ready()
     {
+        song = new AudioStreamPlayer { Name = "Song" };
+        AddChild(song);
+
         ApplySettings(CurrentAttempt.Settings);
 
         // Automatically attempt to start the game if standalone
         if (Standalone)
         {
-            // Play(MapManager.QueuedAttempt()]) -- MapManager will hold a Queue of attempts to play
+            // Play whatever map is already in the library, if any, so old
+            // imported map files are actually played back; otherwise this
+            // just runs as an empty free-drive attempt with no gates.
+            if (MapManager.Initialized && MapManager.Maps.Count > 0)
+            {
+                CurrentAttempt.Map = MapManager.Maps[0];
+            }
+            else
+            {
+                MapManager.MapsInitialized += maps =>
+                {
+                    if (maps.Count > 0)
+                    {
+                        CurrentAttempt.Map = maps[0];
+                        Play(CurrentAttempt);
+                    }
+                };
+            }
+
             Play(CurrentAttempt);
         }
     }
@@ -63,7 +97,10 @@ public partial class GameComponent : Node3D
     {
         if (Playing && !CurrentAttempt.Paused)
         {
-            CurrentAttempt.Progress += delta * 1000;
+            // Drive the clock from the song's own playback position when one
+            // is playing, so notes/gates stay in sync with the audio instead
+            // of drifting against a free-running delta-time clock.
+            CurrentAttempt.Progress = song.Playing ? song.GetPlaybackPosition() * 1000.0 : CurrentAttempt.Progress + delta * 1000;
         }
 
         //  Psuedocode logic for the attempt

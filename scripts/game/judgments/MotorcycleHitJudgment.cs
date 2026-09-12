@@ -22,10 +22,13 @@ public class MotorcycleHitJudgment
             if (Math.Abs(msUntilHit) <= Constants.HIT_WINDOW && MotorcycleLanes.LaneFromNoteX(gate.X) == attempt.BikeLane)
             {
                 gate.Hit = true;
+                attempt.Combo++;
+                attempt.Score += 100 * attempt.Combo;
             }
             else if (msUntilHit < -Constants.HIT_WINDOW)
             {
                 gate.Hit = true; // missed - resolved so it stops being checked/rendered
+                attempt.Combo = 0;
             }
         }
     }

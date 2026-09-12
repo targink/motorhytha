@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/GameComponent.cs" id="1"]
 [ext_resource type="Script" path="res://scripts/game/ui/MotorcycleController.cs" id="2"]
 [ext_resource type="Script" path="res://scripts/game/renderers/GateRenderer.cs" id="3"]
+[ext_resource type="Script" path="res://scripts/game/ui/MotorcycleHud.cs" id="4"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_bike"]
 size = Vector3(0.6, 0.5, 1.2)
@@ -21,7 +22,7 @@ albedo_color = Color(0.35, 0.35, 0.4, 1)
 [node name="MotorcycleGame" type="Node3D" node_paths=PackedStringArray("Camera", "InterfaceComponents", "Renderers")]
 script = ExtResource("1")
 Camera = NodePath("Camera")
-InterfaceComponents = [NodePath("MotorcycleController")]
+InterfaceComponents = [NodePath("MotorcycleController"), NodePath("Hud")]
 Renderers = [NodePath("GateRenderer")]
 
 [node name="Camera" type="Camera3D" parent="."]
@@ -54,3 +55,14 @@ material_override = SubResource("StandardMaterial3D_bike")
 
 [node name="GateRenderer" type="Node3D" parent="."]
 script = ExtResource("3")
+
+[node name="Hud" type="Node3D" parent="." node_paths=PackedStringArray("Label")]
+script = ExtResource("4")
+Label = NodePath("Label")
+
+[node name="Label" type="Label3D" parent="Hud"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 1.6, 1)
+text = "Score 0
+Combo 0"
+font_size = 32
+outline_size = 6

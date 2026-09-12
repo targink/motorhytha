@@ -46,4 +46,10 @@ public partial class Attempt : GodotObject
 
     // Motorcycle mode: bike lean angle in radians, purely cosmetic/feedback.
     public float BikeLean { get; set; }
+
+    // Motorcycle mode: gates cleared in a row / total cleared, tracked by
+    // MotorcycleHitJudgment and shown by MotorcycleHud.
+    public int Combo { get; set; }
+
+    public int Score { get; set; }
 }
