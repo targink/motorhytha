@@ -15,26 +15,49 @@ public partial class GateRenderer : Renderer, IRenderer<Note>
 
     private const float ApproachTimeMs = 1500f;
 
+    // Same rounded-square mesh Rhythia uses for its notes, so gates read as
+    // "the same game" instead of generic placeholder boxes.
+    private const string GateMeshPath = "res://user/meshes/squircle.obj";
+
+    private const float GateScale = 0.85f;
+
     private MultiMeshInstance3D gateMesh { get; set; }
 
     private readonly MotorcycleHitJudgment hitJudgment = new();
 
     private Color transparent = new Color(0x00000000);
 
-    private Color white = new Color(0xffffffff);
+    // One bright, saturated color per lane (left/center/right) so gates read
+    // at a glance which lane they belong to, same idea as lane-colored notes
+    // in other rhythm games.
+    private static readonly Color[] laneColors =
+    [
+        Color.FromHtml("ff4d6d"),
+        Color.FromHtml("ffd23f"),
+        Color.FromHtml("3fa9ff"),
+    ];
 
     public override void _Ready()
     {
         gateMesh = new()
         {
+            MaterialOverride = new StandardMaterial3D
+            {
+                ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
+                Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+                VertexColorUseAsAlbedo = true,
+                CullMode = BaseMaterial3D.CullModeEnum.Disabled,
+            },
             Multimesh = new()
             {
                 UseColors = true,
-                Mesh = new BoxMesh()
+                Mesh = GD.Load<Mesh>(GateMeshPath),
             }
         };
         AddChild(gateMesh);
     }
+
+    private static Color laneColor(int lane) => laneColors[lane + 1];
 
     public void Render(double delta, double time, IList<Note> gates)
     {
@@ -58,8 +81,16 @@ public partial class GateRenderer : Renderer, IRenderer<Note>
             float laneX = MotorcycleLanes.LaneWorldX(lane);
             float z = -(float)(msUntilHit / ApproachTimeMs) * ApproachDistance;
 
-            gateMesh.Multimesh.SetInstanceTransform(i, new Transform3D(Basis.Identity, new Vector3(laneX, 0, z)));
-            gateMesh.Multimesh.SetInstanceColor(i, white);
+            // Fade in as it approaches and gently spin, echoing the classic note approach/fade.
+            float depth = Mathf.Clamp((float)(msUntilHit / ApproachTimeMs), 0f, 1f);
+            float alpha = 1f - Mathf.Pow(depth, 3f);
+            Basis basis = Basis.Identity.Rotated(Vector3.Up, depth * Mathf.Pi * 0.5f).Scaled(Vector3.One * GateScale);
+
+            gateMesh.Multimesh.SetInstanceTransform(i, new Transform3D(basis, new Vector3(laneX, 0, z)));
+
+            Color color = laneColor(lane);
+            color.A = alpha;
+            gateMesh.Multimesh.SetInstanceColor(i, color);
         }
     }
 
