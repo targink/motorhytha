@@ -52,7 +52,8 @@ Motorhytha is an early, actively-developed beta. What works today:
 - **Audio-synced playback** — the map's song plays and drives the game clock, so gates stay in sync with the music instead of drifting.
 - **Basic scoring** — a Score/Combo HUD increments on cleared gates and resets on a miss.
 - **A motorcycle that looks like one** — a small multi-part bike model (body/tank/seat/wheels), gates rendered with Rhythia's own rounded-square "squircle" note mesh in per-lane colors, and a glow-enabled environment so it isn't just flat gray boxes.
-- **A real map-select screen** — lists every map in your library, lets you import more, plus a Free Drive option; this is what actually launches when you start the game.
+- **A real map-select screen** — lists every map in your library, lets you import more, plus Free Drive and Freeroam options; this is what actually launches when you start the game.
+- **Freeroam mode** — smooth, continuous A/D steering across the whole road instead of snapping between the 3 lanes, for just cruising around with no map/gates.
 
 All of the above has been verified against a real map file end-to-end (decoded, cached, listed, played, gates rendered in the right lanes, Score/Combo updating), not just claimed — see [`docs/MOTORCYCLE_FORK.md`](docs/MOTORCYCLE_FORK.md) if you want the details.
 
@@ -65,8 +66,8 @@ What's not built yet: health/fail state, proper hit-accuracy judgments (a gate c
 There's no packaged release yet — see [Building and Exporting](#building-and-exporting) to run it from source. Once running, you'll land on the map-select screen:
 
 - Press **Import Map** and pick an old Rhythia/Sound Space map file (`.sspm`, `.phxm`, or `.txt`) — it decodes, caches, and shows up in the list as a button. You can also drop an already-converted `.phxm` file straight into your user folder's `maps/` directory and it'll be picked up on next launch.
-- No maps imported? Press **Free Drive** — no gates, just the bike and the road, useful for checking movement/visuals work.
-- In-game: **A** / **D** move the bike one lane left/right.
+- No maps imported? Press **Free Drive** (no gates, still 3 lanes) or **Freeroam** (no gates, no lanes — smooth free steering across the whole road) — both useful for checking movement/visuals work.
+- In-game: **A** / **D** move the bike one lane left/right (Free Drive and normal play), or steer continuously (Freeroam).
 
 Motorhytha uses its own user data folder, separate from a real Rhythia install on the same machine:
 

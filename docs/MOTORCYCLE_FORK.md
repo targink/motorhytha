@@ -32,7 +32,8 @@ obstacle/gate charts, instead of re-deriving timing and scoring.
 | Note mesh: `user/meshes/squircle.obj`, unshaded + vertex-colored | `GateRenderer` reuses the same squircle mesh for gates (instead of a plain `BoxMesh`), colored per lane, fading in and spinning as they approach |
 | Cursor sprite / note glow (bloom from the menu's own `WorldEnvironment`) | `motorcycle.tscn` has its own `WorldEnvironment` (glow enabled, dark background) since it runs standalone and doesn't go through `main.tscn`'s background/space setup |
 | `project.godot`'s `config/name`/`custom_user_dir_name` = `Rhythia` | Both renamed to `Motorhytha`, so this uses its own settings/maps folder instead of colliding with a real Rhythia install on the same machine |
-| Rhythia's map-select UI (`scripts/ui/menu/play/*`) | `MotorcycleSelect` (`scripts/scenes/MotorcycleSelect.cs`, `scenes/motorcycle_select.tscn`) — a minimal list of cached maps + Free Drive, now the project's actual entry point (`project.godot`'s `run/main_scene`); it hands its choice to `GameComponent` via the static `MotorcycleSelection` class before switching scenes |
+| Rhythia's map-select UI (`scripts/ui/menu/play/*`) | `MotorcycleSelect` (`scripts/scenes/MotorcycleSelect.cs`, `scenes/motorcycle_select.tscn`) — a minimal list of cached maps + Free Drive/Freeroam, now the project's actual entry point (`project.godot`'s `run/main_scene`); it hands its choice to `GameComponent` via the static `MotorcycleSelection` class before switching scenes |
+| N/A - no equivalent in grid mode | Freeroam: `Attempt.FreeRoam`, set from `MotorcycleSelection.FreeRoam`. `MotorcycleController` branches on it - normal/Free Drive play snaps between `MotorcycleLanes`' 3 fixed lanes, Freeroam moves continuously within `Constants.MOTORCYCLE_FREEROAM_BOUND` instead |
 | Rhythia's `ImportButton`/`ImportDialog` (`scripts/ui/menu/ImportButton.cs`, `ImportDialog.cs`) | Mirrored directly in `MotorcycleSelect` - same `MapParser.BulkImport` call, same `.sspm`/`.phxm`/`.txt` filters, so old map files work through the actual UI, not just ones already sitting in the cache |
 
 ## Status
@@ -49,8 +50,12 @@ not just the editor.
 A real map-select screen (`MotorcycleSelect`) is now the project's entry
 point: it lists cached maps, lets you import an old map file directly
 (`.sspm`/`.phxm`/`.txt`, via the same `MapParser.BulkImport` Rhythia's own
-import button uses), and has a Free Drive option - hands the choice to
-`GameComponent` before switching to `motorcycle.tscn`.
+import button uses), and has Free Drive and Freeroam options - hands the
+choice to `GameComponent` before switching to `motorcycle.tscn`. Freeroam
+drops the 3-lane snapping entirely for smooth continuous steering across the
+whole road (verified in an exported build: held D, watched the bike drive
+straight past the lane markers onto the open ground instead of snapping
+between them).
 
 This whole pipeline was verified against a real map file, not just assumed
 to work: a generated `.phxm` (native format, embedded audio, notes on all 3
