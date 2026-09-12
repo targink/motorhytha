@@ -34,6 +34,9 @@ public partial class GameComponent : Node3D
     // this component (and motorcycle mode) needs to run standalone.
     private AudioStreamPlayer song;
 
+    private bool wasEscapePressed;
+    private bool wasQuitPressed;
+
     public void Play(Attempt attempt)
     {
         Input.MouseMode = CurrentAttempt.Settings.AbsoluteInput.Value ? Input.MouseModeEnum.ConfinedHidden : Input.MouseModeEnum.Captured;
@@ -48,6 +51,10 @@ public partial class GameComponent : Node3D
         attempt.BikeLane = 0;
         attempt.BikeLaneOffset = 0;
         attempt.FreeRoam = MotorcycleSelection.HasSelection && MotorcycleSelection.FreeRoam;
+        attempt.Health = 100;
+        attempt.IsFailed = false;
+        attempt.LastHitGrade = "";
+        attempt.Paused = false;
 
         song.Stop();
 
@@ -108,7 +115,12 @@ public partial class GameComponent : Node3D
 
     public override void _Process(double delta)
     {
-        if (Playing && !CurrentAttempt.Paused)
+        if (Standalone)
+        {
+            handlePauseAndQuitInput();
+        }
+
+        if (Playing && !CurrentAttempt.Paused && !CurrentAttempt.IsFailed)
         {
             // Drive the clock from the song's own playback position when one
             // is playing, so notes/gates stay in sync with the audio instead
@@ -116,19 +128,10 @@ public partial class GameComponent : Node3D
             CurrentAttempt.Progress = song.Playing ? song.GetPlaybackPosition() * 1000.0 : CurrentAttempt.Progress + delta * 1000;
         }
 
-        //  Psuedocode logic for the attempt
-        //  
-        //  bool[] hitResults = HitJudgment.ProcessHitJudgements(CurrentAttempt);
-        //  foreach (var result in hitResults)
-        //  {
-        //      HealthJudgment.ApplyHitObjectResult(result);
-        //      ScoreJudgment.ApplyHitObjectResult(result);
-        //  }
-        //
-        //  CurrentAttempt.Health = HealthJudgment.Health;
-        //  CurrentAttempt.Score = ScoreJudgment.Score;
-        //
-        //  if (HealthJudgment.IsFail) { Handle fail logic }
+        if (CurrentAttempt.IsFailed && song.Playing)
+        {
+            song.StreamPaused = true;
+        }
 
         // Update rendering (notes/objects) on attempt state
         foreach (var renderer in Renderers)
@@ -144,6 +147,29 @@ public partial class GameComponent : Node3D
 
         EmitSignalAttemptProcess(CurrentAttempt);
 
+    }
+
+    // Escape toggles pause; Q (only while paused or failed) returns to the
+    // select screen. Previously there was no way to leave a running session
+    // short of force-quitting the app.
+    private void handlePauseAndQuitInput()
+    {
+        bool escapePressed = Input.IsPhysicalKeyPressed(Key.Escape);
+        bool quitPressed = Input.IsPhysicalKeyPressed(Key.Q);
+
+        if (escapePressed && !wasEscapePressed && !CurrentAttempt.IsFailed)
+        {
+            CurrentAttempt.Paused = !CurrentAttempt.Paused;
+            song.StreamPaused = CurrentAttempt.Paused;
+        }
+
+        if (quitPressed && !wasQuitPressed && (CurrentAttempt.Paused || CurrentAttempt.IsFailed))
+        {
+            GetTree().ChangeSceneToFile("res://scenes/motorcycle_select.tscn");
+        }
+
+        wasEscapePressed = escapePressed;
+        wasQuitPressed = quitPressed;
     }
 
     public void ApplySettings(SettingsProfile settings)

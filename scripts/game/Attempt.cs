@@ -57,4 +57,14 @@ public partial class Attempt : GodotObject
     // continuous movement across the whole road instead of snapping between
     // the 3 fixed lanes. Set from MotorcycleSelection's Freeroam choice.
     public bool FreeRoam { get; set; }
+
+    // Motorcycle mode: 0-100, ticks down on a miss and up on a hit
+    // (MotorcycleHitJudgment); hitting 0 sets IsFailed.
+    public double Health { get; set; } = 100;
+
+    public bool IsFailed { get; set; }
+
+    // Motorcycle mode: grade of the most recently resolved gate ("Perfect",
+    // "Good", or "Miss"), shown briefly by MotorcycleHud.
+    public string LastHitGrade { get; set; } = "";
 }

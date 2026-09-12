@@ -26,14 +26,17 @@ public partial class MotorcycleController : UIComponent
 
     public override void Process(double delta, Attempt state)
     {
-        if (state.FreeRoam)
+        if (!state.Paused && !state.IsFailed)
         {
-            handleFreeRoamInput(state, delta);
-        }
-        else
-        {
-            handleLaneInput(state);
-            updateBikePosition(state, delta);
+            if (state.FreeRoam)
+            {
+                handleFreeRoamInput(state, delta);
+            }
+            else
+            {
+                handleLaneInput(state);
+                updateBikePosition(state, delta);
+            }
         }
 
         updateBikeLean(state, delta);

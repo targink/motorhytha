@@ -1,8 +1,8 @@
 using Godot;
 
-// Minimal score/combo readout for motorcycle mode, plus what you're
-// actually playing (song title, or which no-map mode is active) since
-// there's no other on-screen context once you're in motorcycle.tscn.
+// Score/combo/health readout for motorcycle mode, what you're actually
+// playing (song title, or which no-map mode is active), and a center-screen
+// message while paused or failed.
 public partial class MotorcycleHud : UIComponent
 {
     [Export]
@@ -10,6 +10,9 @@ public partial class MotorcycleHud : UIComponent
 
     [Export]
     public Label3D SongLabel { get; set; }
+
+    [Export]
+    public Label3D StatusLabel { get; set; }
 
     private bool songLabelSet;
 
@@ -19,16 +22,21 @@ public partial class MotorcycleHud : UIComponent
 
     public override void Process(double delta, Attempt state)
     {
-        Label.Text = $"Score {state.Score}\nCombo {state.Combo}";
+        string grade = string.IsNullOrEmpty(state.LastHitGrade) ? "" : $"\n{state.LastHitGrade}";
+        Label.Text = $"Score {state.Score}\nCombo {state.Combo}\nHealth {Mathf.RoundToInt((float)state.Health)}%{grade}";
 
-        if (songLabelSet)
+        if (!songLabelSet)
         {
-            return;
+            SongLabel.Text = state.Map != null
+                ? (string.IsNullOrEmpty(state.Map.PrettyTitle) ? state.Map.Name : state.Map.PrettyTitle)
+                : (state.FreeRoam ? "Freeroam" : "Free Drive");
+            songLabelSet = true;
         }
 
-        SongLabel.Text = state.Map != null
-            ? (string.IsNullOrEmpty(state.Map.PrettyTitle) ? state.Map.Name : state.Map.PrettyTitle)
-            : (state.FreeRoam ? "Freeroam" : "Free Drive");
-        songLabelSet = true;
+        StatusLabel.Text = state.IsFailed
+            ? "FAILED\nQ: Quit to Menu"
+            : state.Paused
+                ? "PAUSED\nEsc: Resume    Q: Quit to Menu"
+                : "";
     }
 }
