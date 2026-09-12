@@ -26,11 +26,19 @@ obstacle/gate charts, instead of re-deriving timing and scoring.
 | `Grid` (`scripts/game/ui/Grid.cs`) drawing the cursor | `MotorcycleController` (`scripts/game/ui/MotorcycleController.cs`) driving bike lane position, lean, and chase camera |
 | `Note` objects + `NoteRenderer` | Same `Note` objects (unchanged map format), reused as track gates and drawn by `GateRenderer` |
 | `HitJudgment` / `ScoreJudgment` / `HealthJudgment` (unimplemented stubs upstream) | `MotorcycleHitJudgment` — basic lane-vs-timing check that resolves each gate as the bike reaches it |
-| `GameComponent.Play()` | Now also loads `Attempt.Map.Notes` (decoded by the existing `MapParser`) into `Attempt.Objects[typeof(Note)]`, so old map files work unchanged |
+| `GameComponent.Play()` | Now also loads `Attempt.Map.Notes` (decoded by the existing `MapParser`) into `Attempt.Objects[typeof(Note)]`, so old map files work unchanged, and plays that map's audio through its own `AudioStreamPlayer` |
+| Free-running/song-driven progress clock | `Attempt.Progress` is driven by the song's actual playback position (`AudioStreamPlayer.GetPlaybackPosition()`) whenever one is playing, falling back to a delta-time clock in freeplay with no map |
+| `ScoreJudgment` (unimplemented stub upstream) | `MotorcycleHitJudgment` also tracks `Attempt.Score`/`Attempt.Combo`, shown by a new `MotorcycleHud` |
 
 ## Status
 
-Basic playable loop: an old map's notes load in, the clock (`Attempt.Progress`)
-advances every frame, the bike moves between 3 lanes with A/D, and gates
-resolve as hit/missed when they reach the bike. Scoring, health, audio
-playback sync, and actual track/bike art are still not wired up.
+Playable loop end-to-end: `GameComponent` auto-selects the first map in the
+player's library, loads its notes and audio, and plays it back in sync. The
+bike moves between 3 lanes with A/D, gates resolve as hit/missed against
+`HIT_WINDOW`, and Score/Combo update on a HUD. Verified in an actual exported
+build (screenshot-tested via a headless run), not just the editor.
+
+Still missing: a map-select screen (it just grabs the first map found),
+health/fail state, graded hit accuracy (currently pass/fail only, not
+timing-graded), and real bike/track art — everything visible today is
+placeholder boxes.
