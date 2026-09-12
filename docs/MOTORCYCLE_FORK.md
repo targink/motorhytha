@@ -33,6 +33,7 @@ obstacle/gate charts, instead of re-deriving timing and scoring.
 | Cursor sprite / note glow (bloom from the menu's own `WorldEnvironment`) | `motorcycle.tscn` has its own `WorldEnvironment` (glow enabled, dark background) since it runs standalone and doesn't go through `main.tscn`'s background/space setup |
 | `project.godot`'s `config/name`/`custom_user_dir_name` = `Rhythia` | Both renamed to `Motorhytha`, so this uses its own settings/maps folder instead of colliding with a real Rhythia install on the same machine |
 | Rhythia's map-select UI (`scripts/ui/menu/play/*`) | `MotorcycleSelect` (`scripts/scenes/MotorcycleSelect.cs`, `scenes/motorcycle_select.tscn`) — a minimal list of cached maps + Free Drive, now the project's actual entry point (`project.godot`'s `run/main_scene`); it hands its choice to `GameComponent` via the static `MotorcycleSelection` class before switching scenes |
+| Rhythia's `ImportButton`/`ImportDialog` (`scripts/ui/menu/ImportButton.cs`, `ImportDialog.cs`) | Mirrored directly in `MotorcycleSelect` - same `MapParser.BulkImport` call, same `.sspm`/`.phxm`/`.txt` filters, so old map files work through the actual UI, not just ones already sitting in the cache |
 
 ## Status
 
@@ -46,8 +47,19 @@ Verified in an actual exported build (screenshot-tested via a headless run),
 not just the editor.
 
 A real map-select screen (`MotorcycleSelect`) is now the project's entry
-point: it lists cached maps plus a Free Drive option and hands the choice to
+point: it lists cached maps, lets you import an old map file directly
+(`.sspm`/`.phxm`/`.txt`, via the same `MapParser.BulkImport` Rhythia's own
+import button uses), and has a Free Drive option - hands the choice to
 `GameComponent` before switching to `motorcycle.tscn`.
+
+This whole pipeline was verified against a real map file, not just assumed
+to work: a generated `.phxm` (native format, embedded audio, notes on all 3
+lanes) was decoded, appeared in the select screen, and playing it rendered
+squircle gates in the correct lane colors with Score/Combo updating
+correctly. That test also caught a real bug - `GateRenderer`'s `MultiMesh`
+never set `TransformFormat` to `Transform3D` (it defaults to `Transform2D`),
+so gates were silently failing to render entirely once a map actually had
+notes. Fixed now.
 
 Still missing: health/fail state, graded hit accuracy (currently pass/fail
 only, not timing-graded), and a real track/road model — the lanes themselves

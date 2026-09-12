@@ -48,11 +48,13 @@ See [`docs/MOTORCYCLE_FORK.md`](docs/MOTORCYCLE_FORK.md) for the full design rat
 Motorhytha is an early, actively-developed beta. What works today:
 
 - **A/D lane movement** — the bike moves between 3 discrete lanes with eased motion and a cosmetic lean.
-- **Old map import** — any previously-imported map plays back, with its notes collapsed onto 3 lanes.
+- **Old map import** — pick an `.sspm`/`.phxm`/`.txt` file straight from the select screen (same decode path Rhythia already has), and it plays back with its notes collapsed onto 3 lanes.
 - **Audio-synced playback** — the map's song plays and drives the game clock, so gates stay in sync with the music instead of drifting.
 - **Basic scoring** — a Score/Combo HUD increments on cleared gates and resets on a miss.
 - **A motorcycle that looks like one** — a small multi-part bike model (body/tank/seat/wheels), gates rendered with Rhythia's own rounded-square "squircle" note mesh in per-lane colors, and a glow-enabled environment so it isn't just flat gray boxes.
-- **A real map-select screen** — lists every map in your library plus a Free Drive option; this is what actually launches when you start the game.
+- **A real map-select screen** — lists every map in your library, lets you import more, plus a Free Drive option; this is what actually launches when you start the game.
+
+All of the above has been verified against a real map file end-to-end (decoded, cached, listed, played, gates rendered in the right lanes, Score/Combo updating), not just claimed — see [`docs/MOTORCYCLE_FORK.md`](docs/MOTORCYCLE_FORK.md) if you want the details.
 
 What's not built yet: health/fail state, proper hit-accuracy judgments (a gate currently only checks lane + timing window, not a graded hit), a real track/road model (lanes are still flat colored strips), and a packaged release build.
 
@@ -62,7 +64,7 @@ What's not built yet: health/fail state, proper hit-accuracy judgments (a gate c
 
 There's no packaged release yet — see [Building and Exporting](#building-and-exporting) to run it from source. Once running, you'll land on the map-select screen:
 
-- Drop an old Rhythia/Sound Space map file into your user folder's `maps/` directory and it'll show up in the list as a button.
+- Press **Import Map** and pick an old Rhythia/Sound Space map file (`.sspm`, `.phxm`, or `.txt`) — it decodes, caches, and shows up in the list as a button. You can also drop an already-converted `.phxm` file straight into your user folder's `maps/` directory and it'll be picked up on next launch.
 - No maps imported? Press **Free Drive** — no gates, just the bike and the road, useful for checking movement/visuals work.
 - In-game: **A** / **D** move the bike one lane left/right.
 
