@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/GameComponent.cs" id="1"]
 [ext_resource type="Script" path="res://scripts/game/ui/MotorcycleController.cs" id="2"]
@@ -37,7 +37,7 @@ emission = Color(0.35, 0.2, 0.6, 1)
 emission_energy_multiplier = 0.25
 
 [sub_resource type="BoxMesh" id="BoxMesh_body"]
-size = Vector3(0.34, 0.32, 1.0)
+size = Vector3(0.3, 0.26, 0.7)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
 shading_mode = 0
@@ -46,8 +46,11 @@ emission_enabled = true
 emission = Color(0.95, 0.12, 0.22, 1)
 emission_energy_multiplier = 0.8
 
+[sub_resource type="BoxMesh" id="BoxMesh_cowl"]
+size = Vector3(0.26, 0.24, 0.32)
+
 [sub_resource type="BoxMesh" id="BoxMesh_tank"]
-size = Vector3(0.3, 0.2, 0.32)
+size = Vector3(0.28, 0.18, 0.3)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tank"]
 shading_mode = 0
@@ -57,11 +60,42 @@ emission = Color(1, 0.8, 0.15, 1)
 emission_energy_multiplier = 0.6
 
 [sub_resource type="BoxMesh" id="BoxMesh_seat"]
-size = Vector3(0.26, 0.16, 0.4)
+size = Vector3(0.26, 0.14, 0.42)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_seat"]
 shading_mode = 0
 albedo_color = Color(0.08, 0.08, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_windshield"]
+size = Vector3(0.2, 0.2, 0.03)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_windshield"]
+shading_mode = 0
+albedo_color = Color(0.35, 0.45, 0.55, 0.6)
+transparency = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_handlebar"]
+size = Vector3(0.52, 0.04, 0.04)
+
+[sub_resource type="BoxMesh" id="BoxMesh_headlight"]
+size = Vector3(0.14, 0.1, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_headlight"]
+shading_mode = 0
+albedo_color = Color(1, 0.95, 0.7, 1)
+emission_enabled = true
+emission = Color(1, 0.95, 0.7, 1)
+emission_energy_multiplier = 1.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_taillight"]
+size = Vector3(0.18, 0.08, 0.05)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_taillight"]
+shading_mode = 0
+albedo_color = Color(1, 0.1, 0.15, 1)
+emission_enabled = true
+emission = Color(1, 0.1, 0.15, 1)
+emission_energy_multiplier = 1.4
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_wheel"]
 top_radius = 0.28
@@ -113,11 +147,17 @@ Camera = NodePath("../Camera")
 [node name="Bike" type="Node3D" parent="MotorcycleController"]
 
 [node name="Body" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.05)
 mesh = SubResource("BoxMesh_body")
 material_override = SubResource("StandardMaterial3D_body")
 
+[node name="Cowl" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.42)
+mesh = SubResource("BoxMesh_cowl")
+material_override = SubResource("StandardMaterial3D_body")
+
 [node name="Tank" type="MeshInstance3D" parent="MotorcycleController/Bike"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -0.28)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -0.1)
 mesh = SubResource("BoxMesh_tank")
 material_override = SubResource("StandardMaterial3D_tank")
 
@@ -126,13 +166,33 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0.32)
 mesh = SubResource("BoxMesh_seat")
 material_override = SubResource("StandardMaterial3D_seat")
 
+[node name="Windshield" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+transform = Transform3D(1, 0, 0, 0, 0.906308, 0.422618, 0, -0.422618, 0.906308, 0, 0.3, -0.46)
+mesh = SubResource("BoxMesh_windshield")
+material_override = SubResource("StandardMaterial3D_windshield")
+
+[node name="Handlebar" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.34, -0.42)
+mesh = SubResource("BoxMesh_handlebar")
+material_override = SubResource("StandardMaterial3D_wheel")
+
+[node name="Headlight" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.58)
+mesh = SubResource("BoxMesh_headlight")
+material_override = SubResource("StandardMaterial3D_headlight")
+
+[node name="TailLight" type="MeshInstance3D" parent="MotorcycleController/Bike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0.54)
+mesh = SubResource("BoxMesh_taillight")
+material_override = SubResource("StandardMaterial3D_taillight")
+
 [node name="FrontWheel" type="MeshInstance3D" parent="MotorcycleController/Bike"]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, -0.16, -0.46)
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, -0.16, -0.5)
 mesh = SubResource("CylinderMesh_wheel")
 material_override = SubResource("StandardMaterial3D_wheel")
 
 [node name="RearWheel" type="MeshInstance3D" parent="MotorcycleController/Bike"]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, -0.16, 0.46)
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, -0.16, 0.5)
 mesh = SubResource("CylinderMesh_wheel")
 material_override = SubResource("StandardMaterial3D_wheel")
 

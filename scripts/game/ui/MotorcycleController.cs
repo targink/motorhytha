@@ -8,7 +8,17 @@ using Godot;
 // keyboard input isn't tied to mouse-motion events.
 public partial class MotorcycleController : UIComponent
 {
-    private const float LaneChangeSpeed = 8f; // world units/second
+    // Exponential smoothing "sharpness" - higher eases out faster/snappier,
+    // lower feels heavier/more drifty. Frame-rate independent, unlike a
+    // flat units/second MoveToward (which moved at constant speed then
+    // stopped dead the instant it hit the target).
+    private const float LaneSmoothing = 14f;
+
+    private const float FreeRoamAccelSmoothing = 8f;
+
+    private const float LeanSmoothing = 10f;
+
+    private const float CameraSmoothing = 18f;
 
     [Export]
     public Node3D Bike { get; set; }
@@ -19,6 +29,8 @@ public partial class MotorcycleController : UIComponent
     private bool wasLeftPressed;
     private bool wasRightPressed;
     private float previousPositionX;
+    private float freeRoamVelocity;
+    private float cameraX;
 
     public override void ApplySettings(SettingsProfile settings)
     {
@@ -40,7 +52,7 @@ public partial class MotorcycleController : UIComponent
         }
 
         updateBikeLean(state, delta);
-        updateCamera(state);
+        updateCamera(state, delta);
     }
 
     private void handleLaneInput(Attempt state)
@@ -65,26 +77,31 @@ public partial class MotorcycleController : UIComponent
     private void updateBikePosition(Attempt state, double delta)
     {
         float targetX = MotorcycleLanes.LaneWorldX(state.BikeLane);
-        state.BikeLaneOffset = Mathf.MoveToward(state.BikeLaneOffset, targetX, LaneChangeSpeed * (float)delta);
+        state.BikeLaneOffset = smoothTo(state.BikeLaneOffset, targetX, LaneSmoothing, delta);
 
         Bike.Position = new Vector3(state.BikeLaneOffset, Bike.Position.Y, Bike.Position.Z);
     }
 
     // Freeroam: smooth continuous steering across the whole road instead of
     // snapping between the 3 fixed lanes - no gates/scoring to line up with.
+    // Accelerates/decelerates toward a target speed rather than jumping
+    // straight to it, so starting, stopping, and reversing direction all
+    // ease instead of snapping.
     private void handleFreeRoamInput(Attempt state, double delta)
     {
         bool leftPressed = Input.IsPhysicalKeyPressed(Key.A);
         bool rightPressed = Input.IsPhysicalKeyPressed(Key.D);
 
         float direction = (rightPressed ? 1f : 0f) - (leftPressed ? 1f : 0f);
-        float targetX = Mathf.Clamp(
-            state.BikeLaneOffset + direction * Constants.MOTORCYCLE_FREEROAM_SPEED * (float)delta,
+        float targetVelocity = direction * Constants.MOTORCYCLE_FREEROAM_SPEED;
+        freeRoamVelocity = smoothTo(freeRoamVelocity, targetVelocity, FreeRoamAccelSmoothing, delta);
+
+        state.BikeLaneOffset = Mathf.Clamp(
+            state.BikeLaneOffset + freeRoamVelocity * (float)delta,
             -Constants.MOTORCYCLE_FREEROAM_BOUND,
             Constants.MOTORCYCLE_FREEROAM_BOUND
         );
 
-        state.BikeLaneOffset = targetX;
         Bike.Position = new Vector3(state.BikeLaneOffset, Bike.Position.Y, Bike.Position.Z);
     }
 
@@ -94,20 +111,32 @@ public partial class MotorcycleController : UIComponent
         float velocity = delta > 0 ? (state.BikeLaneOffset - previousPositionX) / (float)delta : 0f;
         previousPositionX = state.BikeLaneOffset;
 
-        state.BikeLean = Mathf.Clamp(-velocity * 0.15f, -Mathf.Pi / 6, Mathf.Pi / 6);
+        float targetLean = Mathf.Clamp(-velocity * 0.15f, -Mathf.Pi / 6, Mathf.Pi / 6);
+        state.BikeLean = smoothTo(state.BikeLean, targetLean, LeanSmoothing, delta);
         Bike.Rotation = new Vector3(Bike.Rotation.X, Bike.Rotation.Y, state.BikeLean);
     }
 
-    private void updateCamera(Attempt state)
+    private void updateCamera(Attempt state, double delta)
     {
         if (Camera == null)
         {
             return;
         }
 
-        Camera.Position = new Vector3(state.BikeLaneOffset, Camera.Position.Y, Camera.Position.Z);
+        // A touch of lag behind the bike instead of locking to it exactly -
+        // reads as a real chase camera rather than a rigidly-attached one.
+        cameraX = smoothTo(cameraX, state.BikeLaneOffset, CameraSmoothing, delta);
+        Camera.Position = new Vector3(cameraX, Camera.Position.Y, Camera.Position.Z);
 
         state.CameraPosition = Camera.Position;
         state.CameraRotation = Camera.Rotation;
+    }
+
+    // Frame-rate independent exponential ease toward a target - decelerates
+    // as it approaches instead of moving at a constant speed and stopping
+    // dead, and never overshoots.
+    private static float smoothTo(float current, float target, float sharpness, double delta)
+    {
+        return Mathf.Lerp(current, target, 1f - Mathf.Exp(-sharpness * (float)delta));
     }
 }
