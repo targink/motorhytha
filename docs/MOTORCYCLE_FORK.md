@@ -32,6 +32,7 @@ obstacle/gate charts, instead of re-deriving timing and scoring.
 | Note mesh: `user/meshes/squircle.obj`, unshaded + vertex-colored | `GateRenderer` reuses the same squircle mesh for gates (instead of a plain `BoxMesh`), colored per lane, fading in and spinning as they approach |
 | Cursor sprite / note glow (bloom from the menu's own `WorldEnvironment`) | `motorcycle.tscn` has its own `WorldEnvironment` (glow enabled, dark background) since it runs standalone and doesn't go through `main.tscn`'s background/space setup |
 | `project.godot`'s `config/name`/`custom_user_dir_name` = `Rhythia` | Both renamed to `Motorhytha`, so this uses its own settings/maps folder instead of colliding with a real Rhythia install on the same machine |
+| Rhythia's map-select UI (`scripts/ui/menu/play/*`) | `MotorcycleSelect` (`scripts/scenes/MotorcycleSelect.cs`, `scenes/motorcycle_select.tscn`) — a minimal list of cached maps + Free Drive, now the project's actual entry point (`project.godot`'s `run/main_scene`); it hands its choice to `GameComponent` via the static `MotorcycleSelection` class before switching scenes |
 
 ## Status
 
@@ -44,7 +45,10 @@ Rhythia's own squircle note mesh with per-lane colors and a glow environment.
 Verified in an actual exported build (screenshot-tested via a headless run),
 not just the editor.
 
-Still missing: a map-select screen (it just grabs the first map found),
-health/fail state, graded hit accuracy (currently pass/fail only, not
-timing-graded), and a real track/road model — the lanes themselves are still
-flat colored strips, not a modeled road.
+A real map-select screen (`MotorcycleSelect`) is now the project's entry
+point: it lists cached maps plus a Free Drive option and hands the choice to
+`GameComponent` before switching to `motorcycle.tscn`.
+
+Still missing: health/fail state, graded hit accuracy (currently pass/fail
+only, not timing-graded), and a real track/road model — the lanes themselves
+are still flat colored strips, not a modeled road.

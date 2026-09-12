@@ -52,18 +52,19 @@ Motorhytha is an early, actively-developed beta. What works today:
 - **Audio-synced playback** — the map's song plays and drives the game clock, so gates stay in sync with the music instead of drifting.
 - **Basic scoring** — a Score/Combo HUD increments on cleared gates and resets on a miss.
 - **A motorcycle that looks like one** — a small multi-part bike model (body/tank/seat/wheels), gates rendered with Rhythia's own rounded-square "squircle" note mesh in per-lane colors, and a glow-enabled environment so it isn't just flat gray boxes.
+- **A real map-select screen** — lists every map in your library plus a Free Drive option; this is what actually launches when you start the game.
 
-What's not built yet: a map-select screen (it currently auto-picks the first map in your library), health/fail state, proper hit-accuracy judgments (a gate currently only checks lane + timing window, not a graded hit), a real track/road model (lanes are still flat colored strips), and a packaged release build.
+What's not built yet: health/fail state, proper hit-accuracy judgments (a gate currently only checks lane + timing window, not a graded hit), a real track/road model (lanes are still flat colored strips), and a packaged release build.
 
 ---
 
 ## Playing
 
-There's no packaged release yet — see [Building and Exporting](#building-and-exporting) to run it from source. Once running:
+There's no packaged release yet — see [Building and Exporting](#building-and-exporting) to run it from source. Once running, you'll land on the map-select screen:
 
-- **A** / **D** — move the bike one lane left/right.
-- Drop an old Rhythia/Sound Space map file into your user folder's `maps/` directory and it'll be picked up automatically (the game currently just plays whichever map it finds first — there's no map-select screen yet).
-- With no maps imported, it still runs as a free-drive attempt: no gates, just the bike and the road, useful for checking movement/visuals work.
+- Drop an old Rhythia/Sound Space map file into your user folder's `maps/` directory and it'll show up in the list as a button.
+- No maps imported? Press **Free Drive** — no gates, just the bike and the road, useful for checking movement/visuals work.
+- In-game: **A** / **D** move the bike one lane left/right.
 
 Motorhytha uses its own user data folder, separate from a real Rhythia install on the same machine:
 
@@ -92,14 +93,15 @@ Motorhytha uses its own user data folder, separate from a real Rhythia install o
 ├── fonts/           # Font assets
 ├── meshes/          # 3D mesh assets
 ├── prefabs/         # Reusable scene prefabs (UI elements, etc.)
-├── scenes/          # Main game scenes, including motorcycle.tscn
+├── scenes/          # Main game scenes: motorcycle_select.tscn (entry point)
+│                    #  and motorcycle.tscn (gameplay)
 ├── scripts/         # C# source code
 │   ├── database/    # Database / persistence layer
 │   ├── game/        # Core gameplay (attempts, renderers, mods, judgments,
 │   │                #  motorcycle-mode scripts live alongside the rest here)
 │   ├── map/         # Map parsing and management (unchanged old-format support)
 │   ├── multiplayer/ # Multiplayer lobby and player logic
-│   ├── scenes/      # Scene-specific scripts
+│   ├── scenes/      # Scene-specific scripts, including MotorcycleSelect.cs
 │   ├── shaders/     # Shader code
 │   ├── skinning/    # Skin loading and management
 │   ├── spaces/      # Space-related logic
