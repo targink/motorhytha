@@ -70,12 +70,24 @@ public partial class GameComponent : Node3D
         // Automatically attempt to start the game if standalone
         if (Standalone)
         {
-            // Play whatever map is already in the library, if any, so old
-            // imported map files are actually played back; otherwise this
-            // just runs as an empty free-drive attempt with no gates.
-            if (MapManager.Initialized && MapManager.Maps.Count > 0)
+            if (MotorcycleSelection.HasSelection)
             {
-                CurrentAttempt.Map = MapManager.Maps[0];
+                // Came from MotorcycleSelect with an explicit choice (a map,
+                // or Free Drive/null) - honor it, don't second-guess it.
+                CurrentAttempt.Map = MotorcycleSelection.SelectedMap;
+                Play(CurrentAttempt);
+            }
+            else if (MapManager.Initialized)
+            {
+                // Running motorcycle.tscn directly (e.g. F6 in the editor)
+                // without going through the select screen - fall back to
+                // whatever's first in the library, or free-drive if empty.
+                if (MapManager.Maps.Count > 0)
+                {
+                    CurrentAttempt.Map = MapManager.Maps[0];
+                }
+
+                Play(CurrentAttempt);
             }
             else
             {
@@ -84,12 +96,11 @@ public partial class GameComponent : Node3D
                     if (maps.Count > 0)
                     {
                         CurrentAttempt.Map = maps[0];
-                        Play(CurrentAttempt);
                     }
+
+                    Play(CurrentAttempt);
                 };
             }
-
-            Play(CurrentAttempt);
         }
     }
 
