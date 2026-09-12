@@ -25,7 +25,8 @@ obstacle/gate charts, instead of re-deriving timing and scoring.
 | 3×3 grid (3 columns × 3 rows) | Collapsed to 3×1: a chart's note **X** (column, -1/0/1) becomes the lane, **Y** (row) is ignored, via `MotorcycleLanes.LaneFromNoteX` |
 | `Grid` (`scripts/game/ui/Grid.cs`) drawing the cursor | `MotorcycleController` (`scripts/game/ui/MotorcycleController.cs`) driving bike lane position, lean, and chase camera |
 | `Note` objects + `NoteRenderer` | Same `Note` objects (unchanged map format), reused as track gates and drawn by `GateRenderer` |
-| `HitJudgment` / `ScoreJudgment` / `HealthJudgment` (unimplemented stubs upstream) | `MotorcycleHitJudgment` — basic lane-vs-timing check that resolves each gate as the bike reaches it |
+| `HitJudgment` / `ScoreJudgment` (unimplemented stubs upstream) | `MotorcycleHitJudgment` — grades each gate Perfect/Good/Miss (lane + how close to `HIT_WINDOW`/20ms) as the bike reaches it, updating `Attempt.Score`/`Combo`/`Health` |
+| `HealthJudgment` (framework class, unused upstream) | Not reused as-is: its `defaultFailResult()` returns `Health > 0`, i.e. fails on the very first judged hit while healthy - an inverted condition. `MotorcycleHitJudgment` implements the same adaptive-step health shape directly on `Attempt.Health`/`IsFailed` instead of wiring in the buggy class |
 | `GameComponent.Play()` | Now also loads `Attempt.Map.Notes` (decoded by the existing `MapParser`) into `Attempt.Objects[typeof(Note)]`, so old map files work unchanged, and plays that map's audio through its own `AudioStreamPlayer` |
 | Free-running/song-driven progress clock | `Attempt.Progress` is driven by the song's actual playback position (`AudioStreamPlayer.GetPlaybackPosition()`) whenever one is playing, falling back to a delta-time clock in freeplay with no map |
 | `ScoreJudgment` (unimplemented stub upstream) | `MotorcycleHitJudgment` also tracks `Attempt.Score`/`Attempt.Combo`, shown by a new `MotorcycleHud` |
@@ -35,6 +36,7 @@ obstacle/gate charts, instead of re-deriving timing and scoring.
 | Rhythia's map-select UI (`scripts/ui/menu/play/*`) | `MotorcycleSelect` (`scripts/scenes/MotorcycleSelect.cs`, `scenes/motorcycle_select.tscn`) — a minimal list of cached maps + Free Drive/Freeroam, now the project's actual entry point (`project.godot`'s `run/main_scene`); it hands its choice to `GameComponent` via the static `MotorcycleSelection` class before switching scenes |
 | N/A - no equivalent in grid mode | Freeroam: `Attempt.FreeRoam`, set from `MotorcycleSelection.FreeRoam`. `MotorcycleController` branches on it - normal/Free Drive play snaps between `MotorcycleLanes`' 3 fixed lanes, Freeroam moves continuously within `Constants.MOTORCYCLE_FREEROAM_BOUND` instead |
 | Rhythia's `ImportButton`/`ImportDialog` (`scripts/ui/menu/ImportButton.cs`, `ImportDialog.cs`) | Mirrored directly in `MotorcycleSelect` - same `MapParser.BulkImport` call, same `.sspm`/`.phxm`/`.txt` filters, so old map files work through the actual UI, not just ones already sitting in the cache |
+| No pause UI in grid mode's `GameComponent` (only `Attempt.Paused`, unused) | `GameComponent.handlePauseAndQuitInput()`: Escape toggles `Attempt.Paused` (also pauses `song` and freezes `MotorcycleController`'s movement/`GameComponent`'s judging), Q while paused or failed calls `GetTree().ChangeSceneToFile` back to `motorcycle_select.tscn` |
 
 ## Status
 
@@ -66,6 +68,15 @@ never set `TransformFormat` to `Transform3D` (it defaults to `Transform2D`),
 so gates were silently failing to render entirely once a map actually had
 notes. Fixed now.
 
-Still missing: health/fail state, graded hit accuracy (currently pass/fail
-only, not timing-graded), and a real track/road model — the lanes themselves
-are still flat colored strips, not a modeled road.
+Gates are graded Perfect/Good/Miss (not flat pass/fail), driving both Score
+and a health bar (`Attempt.Health`) that fails the run at 0. Escape
+pauses/resumes (freezing the song, movement, and judging - not just a visual
+overlay), and Q returns to the select screen while paused or failed;
+previously there was no way to leave a running session short of
+force-quitting. Verified in an exported build: Health/grade updated live
+across a Perfect and consecutive Misses, pausing held Health steady across
+two checks 1.5s apart (proving it actually freezes state), and Q correctly
+returned to the select screen.
+
+Still missing: a real track/road model — the lanes themselves are still flat
+colored strips, not a modeled road — and a packaged release build.
