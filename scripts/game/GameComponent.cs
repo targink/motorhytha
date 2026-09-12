@@ -47,6 +47,7 @@ public partial class GameComponent : Node3D
         attempt.Progress = 0;
         attempt.BikeLane = 0;
         attempt.BikeLaneOffset = 0;
+        attempt.FreeRoam = MotorcycleSelection.HasSelection && MotorcycleSelection.FreeRoam;
 
         song.Stop();
 

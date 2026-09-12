@@ -26,13 +26,21 @@ public partial class MotorcycleController : UIComponent
 
     public override void Process(double delta, Attempt state)
     {
-        handleInput(state);
-        updateBikePosition(state, delta);
+        if (state.FreeRoam)
+        {
+            handleFreeRoamInput(state, delta);
+        }
+        else
+        {
+            handleLaneInput(state);
+            updateBikePosition(state, delta);
+        }
+
         updateBikeLean(state, delta);
         updateCamera(state);
     }
 
-    private void handleInput(Attempt state)
+    private void handleLaneInput(Attempt state)
     {
         bool leftPressed = Input.IsPhysicalKeyPressed(Key.A);
         bool rightPressed = Input.IsPhysicalKeyPressed(Key.D);
@@ -56,6 +64,24 @@ public partial class MotorcycleController : UIComponent
         float targetX = MotorcycleLanes.LaneWorldX(state.BikeLane);
         state.BikeLaneOffset = Mathf.MoveToward(state.BikeLaneOffset, targetX, LaneChangeSpeed * (float)delta);
 
+        Bike.Position = new Vector3(state.BikeLaneOffset, Bike.Position.Y, Bike.Position.Z);
+    }
+
+    // Freeroam: smooth continuous steering across the whole road instead of
+    // snapping between the 3 fixed lanes - no gates/scoring to line up with.
+    private void handleFreeRoamInput(Attempt state, double delta)
+    {
+        bool leftPressed = Input.IsPhysicalKeyPressed(Key.A);
+        bool rightPressed = Input.IsPhysicalKeyPressed(Key.D);
+
+        float direction = (rightPressed ? 1f : 0f) - (leftPressed ? 1f : 0f);
+        float targetX = Mathf.Clamp(
+            state.BikeLaneOffset + direction * Constants.MOTORCYCLE_FREEROAM_SPEED * (float)delta,
+            -Constants.MOTORCYCLE_FREEROAM_BOUND,
+            Constants.MOTORCYCLE_FREEROAM_BOUND
+        );
+
+        state.BikeLaneOffset = targetX;
         Bike.Position = new Vector3(state.BikeLaneOffset, Bike.Position.Y, Bike.Position.Z);
     }
 

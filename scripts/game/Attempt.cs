@@ -52,4 +52,9 @@ public partial class Attempt : GodotObject
     public int Combo { get; set; }
 
     public int Score { get; set; }
+
+    // Motorcycle mode: when true, MotorcycleController steers with smooth
+    // continuous movement across the whole road instead of snapping between
+    // the 3 fixed lanes. Set from MotorcycleSelection's Freeroam choice.
+    public bool FreeRoam { get; set; }
 }

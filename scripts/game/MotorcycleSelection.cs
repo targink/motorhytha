@@ -6,4 +6,8 @@ public static class MotorcycleSelection
     public static Map SelectedMap;
 
     public static bool HasSelection;
+
+    // True when the player picked Freeroam: no map, continuous steering
+    // instead of the 3 fixed lanes. See MotorcycleController.FreeRoam.
+    public static bool FreeRoam;
 }

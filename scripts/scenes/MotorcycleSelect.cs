@@ -4,8 +4,9 @@ using Godot;
 
 // Map-select screen for motorcycle mode: lists whatever maps MapManager has
 // already cached, lets the player import an old map file directly (.sspm/
-// .phxm/.txt, same formats/parser Rhythia already supports), and offers a
-// Free Drive option. Hands the choice off to GameComponent (via
+// .phxm/.txt, same formats/parser Rhythia already supports), and offers
+// Free Drive (no map, still lane-locked) and Freeroam (no map, continuous
+// steering) options. Hands the choice off to GameComponent (via
 // MotorcycleSelection) before switching to motorcycle.tscn.
 public partial class MotorcycleSelect : Control
 {
@@ -14,6 +15,9 @@ public partial class MotorcycleSelect : Control
 
     [Export]
     public Button FreeDriveButton { get; set; }
+
+    [Export]
+    public Button FreeRoamButton { get; set; }
 
     [Export]
     public Button ImportButton { get; set; }
@@ -27,6 +31,7 @@ public partial class MotorcycleSelect : Control
     public override void _Ready()
     {
         FreeDriveButton.Pressed += () => selectMap(null);
+        FreeRoamButton.Pressed += () => selectFreeRoam();
         ImportButton.Pressed += () => ImportDialog.Show();
         ImportDialog.FilesSelected += onFilesSelected;
         MapParser.Instance.MapsImportFinished += onImportFinished;
@@ -88,6 +93,15 @@ public partial class MotorcycleSelect : Control
     {
         MotorcycleSelection.SelectedMap = map;
         MotorcycleSelection.HasSelection = true;
+        MotorcycleSelection.FreeRoam = false;
+        GetTree().ChangeSceneToFile("res://scenes/motorcycle.tscn");
+    }
+
+    private void selectFreeRoam()
+    {
+        MotorcycleSelection.SelectedMap = null;
+        MotorcycleSelection.HasSelection = true;
+        MotorcycleSelection.FreeRoam = true;
         GetTree().ChangeSceneToFile("res://scenes/motorcycle.tscn");
     }
 }
