@@ -9,7 +9,7 @@ bg_color = Color(0.08, 0.06, 0.14, 1)
 font_size = 48
 font_color = Color(1, 0.9, 0.3, 1)
 
-[node name="MotorcycleSelect" type="Control" node_paths=PackedStringArray("MapList", "FreeDriveButton", "StatusLabel")]
+[node name="MotorcycleSelect" type="Control" node_paths=PackedStringArray("MapList", "FreeDriveButton", "ImportButton", "ImportDialog", "StatusLabel")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -17,7 +17,9 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 MapList = NodePath("Center/Panel/Layout/Scroll/MapList")
-FreeDriveButton = NodePath("Center/Panel/Layout/FreeDriveButton")
+FreeDriveButton = NodePath("Center/Panel/Layout/Buttons/FreeDriveButton")
+ImportButton = NodePath("Center/Panel/Layout/Buttons/ImportButton")
+ImportDialog = NodePath("Center/Panel/Layout/Buttons/ImportButton/ImportDialog")
 StatusLabel = NodePath("Center/Panel/Layout/StatusLabel")
 
 [node name="Background" type="ColorRect" parent="."]
@@ -66,6 +68,26 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="FreeDriveButton" type="Button" parent="Center/Panel/Layout"]
+[node name="Buttons" type="HBoxContainer" parent="Center/Panel/Layout"]
 layout_mode = 2
-text = "Free Drive (no map)"
+theme_override_constants/separation = 8
+
+[node name="ImportButton" type="Button" parent="Center/Panel/Layout/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Import Map"
+
+[node name="ImportDialog" type="FileDialog" parent="Center/Panel/Layout/Buttons/ImportButton"]
+title = "Open File(s)"
+initial_position = 2
+size = Vector2i(571, 211)
+ok_button_text = "Open"
+file_mode = 1
+access = 2
+filters = PackedStringArray("*.sspm", "*.phxm", "*.txt")
+use_native_dialog = true
+
+[node name="FreeDriveButton" type="Button" parent="Center/Panel/Layout/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Free Drive"

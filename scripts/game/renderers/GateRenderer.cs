@@ -50,6 +50,7 @@ public partial class GateRenderer : Renderer, IRenderer<Note>
             },
             Multimesh = new()
             {
+                TransformFormat = MultiMesh.TransformFormatEnum.Transform3D,
                 UseColors = true,
                 Mesh = GD.Load<Mesh>(GateMeshPath),
             }
