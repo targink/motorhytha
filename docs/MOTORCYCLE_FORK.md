@@ -31,6 +31,7 @@ obstacle/gate charts, instead of re-deriving timing and scoring.
 | `ScoreJudgment` (unimplemented stub upstream) | `MotorcycleHitJudgment` also tracks `Attempt.Score`/`Attempt.Combo`, shown by a new `MotorcycleHud` |
 | Note mesh: `user/meshes/squircle.obj`, unshaded + vertex-colored | `GateRenderer` reuses the same squircle mesh for gates (instead of a plain `BoxMesh`), colored per lane, fading in and spinning as they approach |
 | Cursor sprite / note glow (bloom from the menu's own `WorldEnvironment`) | `motorcycle.tscn` has its own `WorldEnvironment` (glow enabled, dark background) since it runs standalone and doesn't go through `main.tscn`'s background/space setup |
+| `project.godot`'s `config/name`/`custom_user_dir_name` = `Rhythia` | Both renamed to `Motorhytha`, so this uses its own settings/maps folder instead of colliding with a real Rhythia install on the same machine |
 
 ## Status
 

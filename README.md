@@ -62,8 +62,15 @@ What's not built yet: a map-select screen (it currently auto-picks the first map
 There's no packaged release yet — see [Building and Exporting](#building-and-exporting) to run it from source. Once running:
 
 - **A** / **D** — move the bike one lane left/right.
-- Import a map into your Rhythia/Motorhytha user folder the same way you would for Rhythia, and it'll be picked up automatically (the game currently just plays whichever map it finds first — there's no map-select screen yet).
+- Drop an old Rhythia/Sound Space map file into your user folder's `maps/` directory and it'll be picked up automatically (the game currently just plays whichever map it finds first — there's no map-select screen yet).
 - With no maps imported, it still runs as a free-drive attempt: no gates, just the bike and the road, useful for checking movement/visuals work.
+
+Motorhytha uses its own user data folder, separate from a real Rhythia install on the same machine:
+
+| Platform | Path |
+|---|---|
+| **Windows** | `%appdata%\Motorhytha` |
+| **Linux** | `~/.local/share/Motorhytha` |
 
 ---
 
